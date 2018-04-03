@@ -1,0 +1,294 @@
+
+■トラブルシューティング
+    make ができない：
+    %uname -r 
+    4.4.34-V7+
+    %cd /lib/modules/4.4.34-v7+
+    %ln -s build /home/pi/linux
+
+■キーボード
+    ”：”はシフト＋”；”
+
+■解像度の変え方
+    sudo su -
+    cd /boot/uboot
+    cp config.txt config_backup.txt
+    sudo vi config.txt
+    hdmi_group=2
+    hdmi_mode=23
+    exit
+
+■Lazurite Pi 基本操作
+    ・スーパーユーザアクセス
+        sudo su -
+
+    ・Sub-GHz ドライバを有効にする
+        vi /etc/rc.local
+        insmod /home/pi/driver/sub-ghz/drv_bp3596.ko
+
+    ・無線アクセスポイント
+        vi /etc/wpa_supplicant/wpa_supplicant.conf
+
+    ・ruby シリアルモニタ起動
+        cd ruby
+        sudo ./SerialMonitor.rb
+
+■設定
+    ・Raspberry Piコンフィグ設定
+        ＃日本語環境とか
+        sudo raspi-config
+        *を付けるには「スペースキー」
+
+    ・新しいSDを使うときのディスク拡張
+        ・sudo raspi-config ; Configuration Tool 起動
+          「1. Expend Filesystem」を選択 
+        ・sudo rebood ⇒設定は再起動が必要
+
+    ・解像度の変え方
+        sudo su -
+        cd /boot/
+        cp config.txt config_backup.txt
+        sudo vi config.txt
+        hdmi_group=2
+        hdmi_mode=23
+        exit
+        sudo shutdown -r now
+
+    ・アプリインストール
+        sudo apt-get update          # アプリを入れるときはupdateも一緒にした方が良い。
+        sudo apt-get install chromim
+
+    ・Lazurite Gateway IP address: 192.168.20.39
+    ・PC 192.168.20.35
+
+■Debian
+    ・画面は常にオンでありたい。
+    # xset -dpms
+
+■ビルド
+
+    ・ドライバをビルドするとき
+        cd driver/sub-ghz
+        make bp3596_drv.c
+
+    ・ドライバ起動
+        sudo insmod DRV_802154.ko               #insmod をすると　drv-802154e.c の最終行にある、module_init(dev_param_init)が実行される
+
+    ・ドライバ起動拡張
+        sudo insmod DRV_802154.ko channel=61 mode=0x0800 pwr=20             
+
+    ・ドライバ起動確認
+        sudo lsmod              
+    ・ドライバ停止
+        sudo rmmod DRV_802154               #rmmod をすると　drv-802154e.c の最終行にある、module_exit(dev_param_exit)が実行される
+    ・ビルド      make                
+    ・クリア      make clean              
+    ・ログ出力    dmesg               
+
+■920MHzモジュールの通信アドレス
+    PANID: 0xABCD
+    TxAdd: 0x87A4
+
+■サービスの確認
+
+    service --status-all
+
+■Comポート設定
+
+    Lazurite SubGHzをUSB経由でRaspberry Pi経由で接続した場合。
+
+    sudo apt-get install cu
+    sudo apt-get install setserial
+    dmesg
+    setserial /dev/ttyUSB0
+
+    sudo apt-get install compizconfig-settings-manager
+
+    sudo chmod 666 /dev/ttyUSB0
+
+    起動コマンド：
+    cu -s 115200 -l /dev/ttyUSB0
+
+
+% sudo chmod 666 /dev/ttyUSB0
+とすればおｋ。
+chmodはスーパユーザでしか実行できない（多分．．．）ので，sudoで実行する。
+すると，通る。
+ 
+そろそろ接続していこう。
+     % cu -s 115200 -l /dev/ttyUSB0
+と入力する（ボーレートとデバイス名は各自で合わせて欲しい）。
+すると，成功の場合，
+Connected.
+と返してくる。これで通信確立。
+もし，
+Line in use
+とか返してきた場合，パーミッションなどが間違っている可能性があるので，もう一度チェックすること。
+切断の際は，
+~.
+と入力すると，数秒後に切断される。
+
+     % cu -s 115200 -h -l /dev/ttyUSB0 #echo backありちょっと汚いけど
+
+◆samba立上げ
+
+    sudo apt-get install samba
+    sudo apt-get install ufw
+    sudo apt-get update
+
+    sudo mkdir /var/samba
+    sudo chown nobody:nogroup /var/samba
+    sudo chmod 777 /var/samba
+
+    sudo vi /etc/samba/smb.conf
+    ↑実績のあるファイルをコピーすれば良い。
+
+    sudo ufw allow 137/udp
+    sudo ufw allow 138/udp
+    sudo ufw allow 139/tcp
+    sudo ufw allow 445/tcp
+
+    sudo service samba restart
+
+
+◆Google Chromeインストール
+    # wget --no-check-certificate https://dl-ssl.google.com/linux/linux_signing_key.pub
+    # apt-key add linux_signing_key.pub
+
+    /etc/apt/sources.listの編集
+    deb http://dl.google.com/linux/chrome/deb/ stable main
+    上記を/etc/apt/sources.listに追加する
+
+    方法１：
+        $ sudo apt-get update
+        $ sudo apt-get install chromium
+        $ startx
+
+    方法２：
+        aptを更新する
+        % apt-get update
+        インストール
+        % apt-get install google-chrome-stable
+
+    方法３：
+        % apt-get update
+        % apt-get install chromium-browser chromium-browser
+
+
+◆タイムラインとTwitter設定
+    ・sudo apt-get ruby
+    ・sudo apt-get install gem
+    ・sudo apt-get update
+    ・sudo apt-get upgrade
+    ・suoo gem install twitter
+
+◆vimインストール
+    sudo apt-get install vim
+    sudo apt-get install vim-gtk
+
+◆less インストール
+    sudo apt-get install less
+
+◆gparted
+    ・デュアル対応のUSB変換ドングルを用意する。
+    ・コピー元：マイクロＳＤ
+    ・コピー先：ミニＳＤ
+    ・ドングルをRaspPiに挿すとコピー元、コピー先はそれぞれ、sdbかadbにマウントされる。
+      (本説明は、コピー元をsdb、コピー先をsdaにする)
+    ・コピー先のデータを削除しアプライ(緑のチェックボタン)する
+    ・コピー元をリサイズしアプライ。リサイズはマウスで行う。
+      ※これをしないとコピーに時間が掛かってしまう。
+    ・コピー元の緑部分をコピーし、コピー先にペーストする。
+    ・コピー元の黄部分をコピーし、コピー先にペーストする。
+    ・最後にアプライするとコピーを開始する。
+
+
+◆Wifi設定
+    sudo wicd-curses
+
+    ・WEP のときの設定
+
+    起動時に無線LANアダプタで繋がるように設定する（WEP）
+    WEPでは設定をしたことがないのでよくわからないけど、wpa-*ではなくwireless-essidとwireless-keyの2つを設定すればいいらしい。
+    こんな感じ？
+
+    auto lo
+
+    iface lo inet loopback
+
+    allow-hotplug eth0
+    iface eth0 inet dhcp
+
+    allow-hotplug wlan0
+    iface wlan0 inet dhcp
+    wireless-essid 接続先のSSID
+    wireless-key 接続先のキー
+    #wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+    iface default inet dhcp
+
+    詳細はこちら：http://d.hatena.ne.jp/pasela/20121224/raspi_wlan
+
+
+◆カーネルが壊れたとき
+    ①正常なSDカードでRaspiを起動。
+    ②カーネルが壊れたSDカードをUSBドングルでマウント、マウント先を確認する（/dev/sda2とか）
+    ③GPartedをカーネル部に！マークがあることを確認
+    ④以下のコマンドを２回実行する。
+        sudo fsck -fy /dev/sda2
+
+◆リモートディスクトップ
+
+    http://knygt-p.hatenablog.jp/entry/xrdp
+
+    モバイルルータにRaspberryPiと WindowsPCを接続する。
+
+    【RaspberryPiの設定】 以下、実施済みのものは不要
+
+        １．xrdpをインストール
+            $ sudo apt-get update          #インストールの前に、パッケージのデータベースを更新します。
+            $ sudo apt-get install xrdp
+
+        ２．日本語キーボードの配列を追加。
+
+            日本語キーボードを利用している場合は、設定ファイルを追加する必要があります。
+            ※ファイルは、xrdpユーザ会のサイドからダウンロード出来ます。
+
+            $ cd /etc/xrdp/
+            $ sudo wget http://w.vmeta.jp/temp/km-0411.ini     #設定ファイルのダウンロード
+            $ sudo ln -s km-0411.ini km-e0010411.ini
+            $ sudo ln -s km-0411.ini km-e0200411.ini
+            $ sudo ln -s km-0411.ini km-e0210411.ini
+
+       ３．サービス起動
+            実際のxrdpサービスを起動します。
+            $ sudo service xrdp restart
+
+        ４．IPアドレスを調べる
+            ifconfig
+
+    【Windowsから接続】
+            Windowsの「リモートデスクトップ接続」を起動。
+            IPアドレスを入力して、「接続」ボタンをクリック。
+            下の様な画面が出るので、RasbperrypiのIDとパスワードを入力してログイン。
+
+■LazuritePiGateWayセットアップ
+
+    ○設定スクリプト
+        ・https://github.com/NaotakaSaito/myDotFiles
+        上記のクローンを作成する。
+
+    ○その他、クローン
+        ①develop　フォルダを作成。 
+        ②develop の下に下記のクローンを作成する。
+            ・LAPIS-Lazurite/LazGem
+            ・LAPIS-Lazurite/LazuriteGraph
+            ・LAPIS-Lazurite/LazuriteJava
+            ・LAPIS-Lazurite/LazDriver
+            ・LAPIS-Lazurite/LazuriteInstaller
+
+■デバッグ方法
+    Linux のvim 上でmakeを実行し、エラーになったらcopenをする。
+
+
+
+

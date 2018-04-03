@@ -1,0 +1,26 @@
+
+■はじめに
+
+    apt-get upgrade をしたときに、insmod lazdriver.ko を行って、invalid formatというエラーがでる
+    などした場合は、カーネルビルドをする。
+
+■対処方法
+    Lazurite ブログとRaaspi のホームページを見て対処する。
+    http://www.lapis-semi.com/lazurite-jp/raspberry-pi%E9%96%A2%E9%80%A3/12311.html
+    https://www.raspberrypi.org/documentation/linux/kernel/building.md
+
+   【注意】
+    make -j4 zImage modules dtbs
+    sudo make modules_install
+    sudo cp arch/arm/boot/dts/*.dtb /boot/                      ←　~/LazuriteInstaller/LazCnv.awk bp3596_spiを実施していたら特にやらない。
+    sudo cp arch/arm/boot/dts/overlays/*.dtb* /boot/overlays/
+    sudo cp arch/arm/boot/dts/overlays/README /boot/overlays/
+    sudo cp arch/arm/boot/zImage /boot/$KERNEL.img
+
+■確認
+    % uname -r                      # system info 現在のカーネルバージョン 
+    % cat /home/pi/linux/Makefile   # カーネルビルドのバージョン
+    % cat /proc/version             # Linux version, GCC, raspbian などのバージョンが確認できる。
+    % modinfo lazdriver.ko          # ビルドされたモジュールのバージョン確認
+    % /usr/bin/gcc -v               # GCCのバージョン
+

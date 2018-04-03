@@ -1,0 +1,289 @@
+
+//--------------------------------------------
+// 事前準備
+//--------------------------------------------
+    ● インストール
+
+        sudo raspi-config     // これを忘れてupdateするとメモリが壊れる。
+
+        sudo aptitude install git-core git-doc
+
+        sudo apt-get update
+        sudo apt-get upgrade  // 時間がかかるの注意！
+
+        sudo apt-get install git 
+        sudo apt-get install rubygems
+        sudo gem install bundler 
+        sudo gem install gemcutter
+
+
+    ●参考URL
+
+        ◇公式
+            https://git-scm.com/
+            http://bundler.io/
+            http://rake.rubyforge.org/
+            http://magazine.rubyist.net/?0046-RandexMultibyteGem
+
+        ◇ノウハウ
+            http://guides.rubygems.org/command-reference/                               ... gemコマンド一覧
+            http://qiita.com/muran001/items/14f34b735e0a6b4af98c                        ... gemコマンド略一覧    
+
+
+    ●rubygems設定
+
+        ◇ユーザー情報を設定
+         // git config --global user.name "lazurite" 
+         // git config --global user.email "lazurite＠adm.lapis-semi.com" 
+            git config --global user.name "saito253" 
+            git config --global user.email "saito253＠dsn.lapis-semi.com" 
+
+            // アドレスを変更する場合
+            git config --global --unset user.mail
+            // 内容を確認する。
+            git config --list
+
+        ◇一覧表示する場合は--listで行います。
+            git config --global --list 
+            user.name=Firstname Lastname 
+            user.email=your_email＠youremail.com 
+
+
+        ◇gitを使いやすくする
+            git config --global core.editor vi 
+            git config --global core.diff auto 
+            git config --global core.branch auto 
+            git config --global core.status auto 
+
+        ◇SSHのキーを作成
+         // ssh-keygen -t rsa -C "saito253@dsn.lapis-semi.com"
+         // ssh-keygen -t rsa -C "lazurite＠adm.lapis-semi.com"
+         // 何も入力せず、3回 returnする。
+
+
+    ●rubygems.org アカウント登録
+         // 注意：パスワードは、rubygem.org に登録もの（lazurite920)
+         sudo curl -u lazurite https://rubygems.org/api/v1/api_key.yaml > ~/.gem/credentials; chmod 0600 ~/.gem/credentials
+
+
+//--------------------------------------------
+// gem 登録手順
+//--------------------------------------------
+    ◆gitにパッケージ登録
+        // 注意：本作業は必ず本作業はbundleしたフォルダで行う。
+        // 注意：もし例のように"-"を使った場合はライブラリ名が"Lazurite/ruby"になる。
+
+        gitブラウザで github にリポジトリ作成
+        Lazurite-ruby
+
+        $ bundle gem Lazurite-ruby
+            pi@raspberrypi:~$ bundle gem Lazurite-ruby
+            Creating gem 'Lazurite-ruby'...
+            Do you want to generate tests with your gem?
+            spec/minitest/(none): // enter
+            Do you want to license your code permissively under the MIT license?
+            he MIT license at http://choosealicense.com/licenses/mit. y/(n): y
+            MIT License enabled in config
+            Do you want to include a code of conduct in gems you generate?
+            Code of conduct enabled in configct, see http://bit.ly/coc-enforcement. y/(n): y
+                  create  Lazurite-ruby/Gemfile
+                  create  Lazurite-ruby/.gitignore
+                  create  Lazurite-ruby/lib/Lazurite/ruby.rb
+                  create  Lazurite-ruby/lib/Lazurite/ruby/version.rb
+                  create  Lazurite-ruby/Lazurite-ruby.gemspec
+                  create  Lazurite-ruby/Rakefile
+                  create  Lazurite-ruby/README.md
+                  create  Lazurite-ruby/bin/console
+                  create  Lazurite-ruby/bin/setup
+                  create  Lazurite-ruby/LICENSE.txt
+                  create  Lazurite-ruby/CODE_OF_CONDUCT.md
+            Initializing git repo in /home/pi/Lazurite-ruby
+
+        $ cd Lazurite-ruby
+        $ echo "# Lazurite-Ruby" >> README.md
+        $ git init
+        $ git add README.md
+        $ git commit -m "first commit" 
+        $ git remote add origin https://github.com/LAPIS-Lazurite/Lazurite-ruby.git
+
+
+    ◆gemspec
+        $ vi Lazurite-ruby.gemspec
+            1) mail.address などを saito253 -> lazuriteに変更する。
+            2) 下記パラメータを以下の通り修正する。
+               spec.summary       = %q{Write a short summary, because Rubygems requires one.}
+               spec.description   = %q{Write a longer description or delete this line.}
+               spec.homepage      = "https://github.com/LAPIS-Lazurite/Lazurite-ruby"
+            3) Lazurite-ruby 2.0 のif文をそっくりコメントアウトする。
+
+
+    ◆push
+        git push -u origin master
+            Username for 'https://github.com': saito253
+            Password for 'https://saito253@github.com':
+            Branch master set up to track remote branch master from Lazurite-ruby.
+            Everything up-to-date
+
+
+    ◆rubygemsにリリース
+        $ bundle update rake
+        $ > gem_test 0.1.0 built to pkg/gem_test-0.1.0.gem.
+        $ bundle install
+            Rubygems 1.8.23 is not threadsafe, so your gems will be installed one at a time. Upgrade to R
+            ubygems 2.1.0 or higher to enable parallel gem installation.
+            Resolving dependencies...
+            Using rake 10.5.0
+            Using Lazurite-ruby 0.1.0 from source at `.`
+            Using bundler 1.11.2
+            Using diff-lcs 1.2.5
+            Using rspec-support 3.4.1
+            Using rspec-core 3.4.1
+            Using rspec-expectations 3.4.0
+            Using rspec-mocks 3.4.1
+            Using rspec 3.4.0
+            Bundle complete! 4 Gemfile dependencies, 9 gems now installed.
+            Use `bundle show [gemname]` to see where a bundled gem is installed.
+        $ sudo bundle exec rake build
+        $ sudo bundle exec rake install
+            Lazurite-ruby 0.1.0 built to pkg/Lazurite-ruby-0.1.0.gem.
+            Lazurite-ruby (0.1.0) installed.
+            // 注意： .gemspecのユーザが "lazurite"でないと成功しない。
+
+        $ sudo gem push pkg/Lazurite-ruby-0.1.0.gem
+            Enter your RubyGems.org credentials.
+           sudo Don't have an account yet? Create one at http://rubygems.org/sign_up
+               Email:   lazurite@adm.lapis-semi.com
+            Password:
+            Pushing gem to https://rubygems.org...
+            Signed in.
+            Pushing gem to https://rubygems.org...
+            Successfully registered gem: LazuriteRuby (0.1.0)
+
+
+    ◇gem に登録したライブラリを削除する。
+      // 注意： gemcutter のインストールが必要
+         $  gem yank Lazurite-ruby -v 0.1.0
+      // $  gem yank Lazurite-ruby -v 0.1.0 --undo // 削除を取り消す場合 未サポートコマンド
+
+
+      // $  git push --set-upstream LazuriteRuby master
+      // $  sudo bundle exec rake release
+
+    ◆rubygemsに登録したライブラリをインストール
+         $ sudo gem install Lazurite-ruby --no-ri --no-rdoc
+            Successfully installed Lazurite-ruby-0.1.0
+            1 gem installed
+
+    ◆gemを更新する場合
+         1) lib/xxx/version.rb を更新
+         2) rubygemsにリリースからやり直し
+            
+
+//--------------------------------------------
+//  関連コマンド
+//--------------------------------------------
+    ●version
+
+
+    ●aptコマンド
+        apt（ここでTabキーを2回入力）   // apt一覧
+        sudo apt-get install git-cola   // git クライアント for linux
+
+
+    ●git コマンド
+        git clone https://github.com/LAPIS-Lazurite/Lazurite-ruby.git ./Lazurite-ruby   // github からクローン作る方法
+        git clone -b develop git://github.com/LAPIS-Lazurite/LazDriver.git              // 特定のブランチからクローンを作る方法
+       【注意】clone時の注意点 sudo をつけない。つけるとrootアカウントで取得され、その後そのフォルダでmakeなどのコマンドが使えなくなるから。
+        gitk                                                                            // git gui
+        git                                                                             // git コマンド一覧
+        git add --all                                                                   // カレントにあるコンテンツをすべて登録する。
+        git remote                                                                      // git remote に登録されているアドレス
+        sudo git remote rm origin                                                       // git リモート設定を削除する場合
+        ・更新を元に戻す場合
+            git checkout                // 以前のバージョンに戻す場合
+            git pull                    // リモートサーバーのファイル取得
+        git init … git管理開始	
+        git status … 現状を一覧表示。変更したけどコミットしてないとか、管理外のファイルがあるとか	
+        git add … ファイルをコミット待ちリストに追加	
+        git reset … ファイルをコミット待ちリストから削除	
+        git diff … 現在のファイルとaddしたものとの差を表示	
+        git diff --cached … addしたものとコミット済みのものとの差を表示	
+        git commit … ローカルリポジトリに送信	
+        git checkout … ローカルリポジトリから受信（？）	
+        git push … リモートリポジトリに送信	
+        git pull git://github.com/LAPIS-Lazurite/LazDriver.git develop  … リモートリポジトリから受信	
+
+
+    ●git pull を使わない理由
+        
+        下記の方がシンプルで覚えやすい。
+        git push アップロード 
+        git fetch ダウンロード 
+        git merge ２つのブランチを合流 
+        git rebase 元に戻す
+        git pull    fetch + merge
+        
+
+    ●gem コマンド
+        gem list                     // rubygems登録リスト
+        sudo gem uninstall gem_test  // gem アンインストール
+            Select gem to uninstall:
+             1. gem_test-0.0.1
+             2. gem_test-0.1.0
+             3. All versions
+
+
+        sudo gem uninstall Lazurite-ruby
+        Successfully uninstalled Lazurite-ruby-0.1.0
+        // ちなみに削除直後は、「sudo bundle exec rake install」だけで復活する。
+
+        sudo gem update Lazurite-ruby --no-ri --no-rdoc  // ライブラリ更新
+        gem outdated            // 更新しているライブラリを探す
+        gem which bundler       // gemの場所を探す
+        gem search -r html      // RubyGems.org リポジトリを検索
+        gem search -l html      // インすロール済みgem検索
+
+
+    ●bundle コマンド
+        bundle config
+        bundle init     Gemfile生成
+        bundle install  Gemfileに書かれたGemパッケージをインストール
+        bundle exc      BundlerでインストールされたGemパッケージを使用してコマンドを実行
+        bundle list     インストール済みのGemパッケージの一覧を表示
+        bundle update   インストール済みのGemパッケージのジャーsジョンを更新
+
+
+    ●用語
+        apt（Advanced Package Tool）」
+        パッケージ管理コマンド： apt-get, apt-cache
+        aptitudeは、Debianなどが採用するAPTシステムにおけるCUIフロントエンドの一つ。
+        apt-getとは、linux パッケージ管理システム
+
+
+    ●各コマンドのバージョンと概要
+
+        - gem 1.9.1
+            gem     "RubyGemsと呼ばれるruby言語用ぱっけいーじ管理システム用のコマンド
+            詳細は、下記を参照
+            http://guides.rubygems.org/command-reference/"
+
+        - bundle 1.11.2 
+            "bundlerと呼ばれ、プロジェクト内で使うRubygemsを管理するしくみ。
+            開発環境とデプロイ環境で完全に同じバージョンのひも付を行い、gemがバージョンアップしてもAPIが使えるようにする。
+            Gemfile というテキストファイルを作成し、使用するgemを列挙する。
+
+            source 'https://rubygems.org'
+            gem 'sinatra'
+            gem 'mongoid', '>=2.4.0', '<3.0.0'
+            gem 'json', '~> 1.7'
+            gem 'tw', :git => 'git@github.com:shokai/tw.git'
+
+            Gemfileは、bunlde initを実行すると生成される。
+
+            例えば、以下の二つは、
+            bundle exec rackup config.ru　： bundlerが指定されたコマンドを使用する。
+            　　　　　　　　rackup config.ru　：　そのシステムの最新版を使用する。
+
+        -rake 10.0
+                ビルドツール
+

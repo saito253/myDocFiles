@@ -1,0 +1,65 @@
+
+■RaspberryPiでキーを取得する
+
+pi@raspberrypi$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/pi/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/pi/.ssh/id_rsa.
+Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
+The key fingerprint is:
+85:f0:14:0e:ca:45:98:87:c9:6b:6d:d2:ff:e4:f1:1c pi@raspberrypi
+The key's randomart image is:
++--[ RSA 2048]----+
+|   . *= o.       |
+|   .*o.* .       |
+|    o=  + .      |
+|    + +  .       |
+|   . o .S        |
+|        . o E    |
+|         + + .   |
+|          o o    |
+|                 |
++-----------------+
+pi@raspberrypi ~/.ssh $ ls
+id_rsa  id_rsa.pub
+pi@raspberrypi ~/.ssh $ cat id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCoS5aeJjp6c1Tg4ZugN3DFwe/5ttnMwHDlLUbxqGFQ/isi1nBZKpjk86ZJBp4Kli93HNKC2sxoaz163IOHlMBBly8PoiY3LAFhJyomD/xtXsxhyD89IwdzzooaKFsObMDbPtxugjMuzMqWUl8N7n2BJmrXyDnS0sTxdff7eV8S7QICbk5KV8Ok6/sXMWke60mkEHHLpNjoDLjQ2yFAC/YsNEKjOCPgwIbiLlz2Hdi/aM3UT3WsHW1uLQbhrTpMBBjJIM2ec826OYAc8g1q02+KBoyDjNr7xOakxhd4s1Ff8Wv39nOb4rtAMoYRme+/f6XYP2uImd+EG5aiVwa9bsOH pi@raspberrypi
+
+■この上記 keyをGitHubに設定する。
+
+■設定できたことを確認する
+pi@raspberrypi ~/develop/LazDriver $ ssh -T git@github.com
+Hi saito253! You've successfully authenticated, but GitHub does not provide shell access.
+
+■RaspberryPiにGitHubのアカウントを登録する。
+pi@raspberrypi ~/develop $ cd deverop/LazDriver/
+pi@raspberrypi ~/develop/LazDriver $ git config --global user.name "saito253"
+pi@raspberrypi ~/develop/LazDriver $ git config --global user.email "saito253＠dsn.lapis-semi.com"
+pi@raspberrypi ~/develop/LazDriver $ git config --global --list
+user.name=saito253
+user.email=saito253＠dsn.lapis-semi.com
+
+■RaspberryPiにGitHubのリポジトリも登録する。
+pi@raspberrypi ~/develop/LazDriver $ git remote set-url origin git@github.com:LAPIS-Lazurite/LazDriver.git
+
+■下記のようにdriver branch をpull することができる。
+pi@raspberrypi ~/develop/LazDriver $ git pull origin driver
+From github.com:LAPIS-Lazurite/LazDriver
+ * branch            driver     -> FETCH_HEAD
+Updating 3314327..83a6860
+Fast-forward
+ Makefile         |    2 +-
+ cmdif.c          |  524 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ cmdif.h          |   29 ++++
+ common_802154e.h |    1 +
+ drv-802154e.c    |  268 +-------------------------------
+ ieee802154e.c    |  540 +++++++++++++++++++++++++++++++++++++++++-----------------------
+ ieee802154e.h    |    3 +
+ mac-802154e.c    |    6 +
+ mac-802154e.h    |    1 +
+ 9 files changed, 918 insertions(+), 456 deletions(-)
+ create mode 100755 cmdif.c
+ create mode 100755 cmdif.h
+pi@raspberrypi ~/develop/LazDriver $
